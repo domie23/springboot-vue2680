@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.HuodongxuanchuanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.huodongxuanchuan_name as huodongxuanchuanName
+        ,a.huodongxuanchuan_photo as huodongxuanchuanPhoto
+        ,a.huodongxuanchuan_types as huodongxuanchuanTypes
+        ,a.insert_time as insertTime
+        ,a.huodongxuanchuan_content as huodongxuanchuanContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.HuodongxuanchuanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM huodongxuanchuan  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.huodongxuanchuanName != '' and params.huodongxuanchuanName != null and params.huodongxuanchuanName != 'null' ">
+                and a.huodongxuanchuan_name like CONCAT('%',#{params.huodongxuanchuanName},'%')
+            </if>
+            <if test="params.huodongxuanchuanTypes != null and params.huodongxuanchuanTypes != ''">
+                and a.huodongxuanchuan_types = #{params.huodongxuanchuanTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test=" params.huodongxuanchuanContent != '' and params.huodongxuanchuanContent != null and params.huodongxuanchuanContent != 'null' ">
+                and a.huodongxuanchuan_content like CONCAT('%',#{params.huodongxuanchuanContent},'%')
+            </if>
+
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
